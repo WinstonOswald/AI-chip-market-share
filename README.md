@@ -1,19 +1,21 @@
 # AI Chip Market Share Visualization
 
-An interactive dashboard for visualizing the global market share distribution of AI chip manufacturers over multiple years.
+An interactive dashboard for visualizing the global market share distribution of AI chip manufacturers from 2015-2025, showing the evolution from general GPU market to AI-specific accelerators.
 
 ## Features
 
-- **Interactive Year Range Selection**: Choose any range from 2020-2025
+- **Interactive Year Range Selection**: Choose any range from 2015-2025
 - **Multiple Chart Types**:
   - Bar Chart (grouped comparison)
   - Line Chart (trend analysis)
   - Pie Chart (latest year distribution)
   - Stacked Area Chart (cumulative view)
 - **Dual Metrics**: View both market share percentage and revenue in billions USD
+- **Market Evolution Visualization**: Clear visual distinction between general GPU era (2015-2017) and AI accelerator era (2019-2025)
+- **Transition Marker**: Orange dashed line at 2018 marks the market shift on all time-series charts
 - **Key Statistics**: Real-time metrics for major manufacturers
 - **Data Table**: Detailed pivot table view
-- **Reliable Data Sources**: Compiled from TechInsights, IDC, Statista, and other industry analysts
+- **Reliable Data Sources**: Jon Peddie Research (2015-2017), TechInsights, IDC, Statista (2018+)
 
 ## Installation
 
@@ -44,19 +46,30 @@ The app will open in your default web browser at `http://localhost:8501`
 - **Metric Radio Buttons**: Toggle between market share % and revenue
 - **Show Data Table**: Checkbox to display raw data
 
-## Data Sources
+## Data Sources & Market Evolution
 
-This application uses curated data from:
-- **TechInsights**: Data-Center AI Chip Market Reports
-- **Statista**: AI chip revenue analysis
-- **IDC**: AI Infrastructure market research
-- **Yole Group**: Semiconductor trends
-- **Market Research Firms**: Grand View Research, Precedence Research
+This application visualizes two distinct market periods:
+
+### 2015-2017: General GPU Market
+- **Source**: Jon Peddie Research discrete GPU market reports
+- **Market**: Consumer/gaming GPUs, workstation GPUs, early machine learning
+- **Key Event**: AMD peaked at 33.7% share in 2017 due to cryptocurrency mining boom
+
+### 2018: Transition Year
+- AI workloads began shifting from consumer GPUs to dedicated data center solutions
+- NVIDIA's Tesla V100 and CUDA ecosystem established dominance in AI training
+
+### 2019-2025: AI Accelerator Market
+- **Sources**: TechInsights, IDC, Statista, Yole Group, Grand View Research
+- **Market**: Data center AI chips, ML accelerators, training & inference hardware
+- **Intel Entry**: Intel enters with Gaudi accelerators
+- **AMD Pivot**: AMD shifts focus to MI-series data center accelerators
 
 ### Key Data Points:
-- 2023: $17.7B market (NVIDIA 65%, Intel 22%, AMD 11%)
-- 2024: NVIDIA captured 93% of server GPU revenue
-- 2025: NVIDIA projected at 86-92% AI GPU market share
+- **2015-2017**: General GPU market ($5-8B), NVIDIA 66-81%, AMD 19-34%
+- **2023**: $17.7B AI market (NVIDIA 65%, Intel 22%, AMD 11%) [TechInsights]
+- **2024**: $50B+ market, NVIDIA 88-93% of server GPU revenue
+- **2025**: $100B+ projected, NVIDIA 87%, AMD growing to 6.5%
 
 ## Technologies Used
 

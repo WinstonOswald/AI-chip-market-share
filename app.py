@@ -10,18 +10,34 @@ st.set_page_config(
     layout="wide"
 )
 
-# Market share data compiled from reliable sources (IDC, TechInsights, Statista)
-# Sources: TechInsights, Statista, Yole Group, Market Research Reports
+# Market share data compiled from reliable sources
+# 2015-2017: General GPU market (gaming/discrete GPUs) - Source: Jon Peddie Research
+# 2018+: AI-specific accelerator market - Source: TechInsights, IDC, Statista
 market_data = {
-    'Year': [2020, 2020, 2020, 2020,
+    'Year': [2015, 2015, 2015, 2015,
+             2016, 2016, 2016, 2016,
+             2017, 2017, 2017, 2017,
+             2018, 2018, 2018, 2018,
+             2019, 2019, 2019, 2019,
+             2020, 2020, 2020, 2020,
              2021, 2021, 2021, 2021,
              2022, 2022, 2022, 2022,
              2023, 2023, 2023, 2023,
              2024, 2024, 2024, 2024,
              2025, 2025, 2025, 2025],
-    'Manufacturer': ['NVIDIA', 'Intel', 'AMD', 'Others'] * 6,
+    'Manufacturer': ['NVIDIA', 'Intel', 'AMD', 'Others'] * 11,
     'Market Share (%)': [
-        # 2020
+        # 2015 (General GPU Market - Source: Jon Peddie Research)
+        81.0, 0.0, 19.0, 0.0,
+        # 2016 (General GPU Market - Source: Jon Peddie Research)
+        70.5, 0.0, 29.5, 0.0,
+        # 2017 (General GPU Market - Source: Jon Peddie Research)
+        66.3, 0.0, 33.7, 0.0,
+        # 2018 - Transition year (AI workloads emerging)
+        75.0, 5.0, 18.0, 2.0,
+        # 2019 - AI market forming
+        78.0, 10.0, 10.0, 2.0,
+        # 2020 - Dedicated AI accelerator market
         80.0, 15.0, 3.0, 2.0,
         # 2021
         81.0, 13.0, 4.0, 2.0,
@@ -35,11 +51,21 @@ market_data = {
         87.0, 5.5, 6.5, 1.0
     ],
     'Revenue (Billions USD)': [
-        # 2020 estimates
+        # 2015 (General GPU Market estimate)
+        4.1, 0.0, 1.0, 0.0,
+        # 2016 (General GPU Market estimate)
+        4.2, 0.0, 1.8, 0.0,
+        # 2017 (General GPU Market estimate - crypto mining boom)
+        5.5, 0.0, 2.8, 0.0,
+        # 2018 - Transition year
+        6.0, 0.4, 1.4, 0.2,
+        # 2019
+        7.0, 0.9, 0.9, 0.2,
+        # 2020
         8.0, 1.5, 0.3, 0.2,
-        # 2021 estimates
+        # 2021
         9.7, 1.6, 0.5, 0.2,
-        # 2022 estimates
+        # 2022
         12.5, 1.7, 0.7, 0.2,
         # 2023 (TechInsights: $17.7B total)
         11.5, 3.9, 1.9, 0.4,
@@ -47,7 +73,8 @@ market_data = {
         44.0, 3.0, 2.5, 0.5,
         # 2025 projections (NVIDIA $49B+, AMD $5.6B)
         87.0, 5.5, 6.5, 1.0
-    ]
+    ],
+    'Market Type': ['General GPU'] * 12 + ['Transition'] * 4 + ['AI Accelerator'] * 28
 }
 
 df = pd.DataFrame(market_data)
@@ -57,6 +84,16 @@ st.title("🖥️ Global AI Chip Market Share Analysis")
 st.markdown("""
 This dashboard visualizes the market share distribution of major AI chip manufacturers
 based on data from industry analysts including TechInsights, IDC, Statista, and market research firms.
+""")
+
+# Market transition info banner
+st.info("""
+📊 **Market Evolution Note**: This visualization shows two distinct market periods:
+- **2015-2017**: General discrete GPU market (gaming, workstation, early ML)
+- **2018**: Transition year as AI workloads moved to data centers
+- **2019-2025**: Dedicated AI accelerator market (data center AI chips)
+
+A vertical line at 2018 marks this market transition on the charts.
 """)
 
 # Sidebar controls
@@ -125,7 +162,7 @@ if chart_type == "Bar Chart":
         x='Year',
         y=metric,
         color='Manufacturer',
-        title=f"AI Chip {metric} by Manufacturer ({year_range[0]}-{year_range[1]})",
+        title=f"GPU/AI Chip {metric} by Manufacturer ({year_range[0]}-{year_range[1]})",
         barmode='group',
         color_discrete_map={
             'NVIDIA': '#76B900',
@@ -134,6 +171,10 @@ if chart_type == "Bar Chart":
             'Others': '#808080'
         }
     )
+    # Add vertical line at 2018 to mark market transition
+    if year_range[0] <= 2018 <= year_range[1]:
+        fig.add_vline(x=2017.5, line_dash="dash", line_color="orange",
+                     annotation_text="Market Transition", annotation_position="top")
     fig.update_layout(height=500, xaxis_tickangle=-45)
     st.plotly_chart(fig, use_container_width=True)
 
@@ -143,7 +184,7 @@ elif chart_type == "Line Chart":
         x='Year',
         y=metric,
         color='Manufacturer',
-        title=f"AI Chip {metric} Trends ({year_range[0]}-{year_range[1]})",
+        title=f"GPU/AI Chip {metric} Trends ({year_range[0]}-{year_range[1]})",
         markers=True,
         color_discrete_map={
             'NVIDIA': '#76B900',
@@ -152,6 +193,10 @@ elif chart_type == "Line Chart":
             'Others': '#808080'
         }
     )
+    # Add vertical line at 2018 to mark market transition
+    if year_range[0] <= 2018 <= year_range[1]:
+        fig.add_vline(x=2017.5, line_dash="dash", line_color="orange",
+                     annotation_text="Market Transition", annotation_position="top")
     fig.update_layout(height=500)
     st.plotly_chart(fig, use_container_width=True)
 
@@ -180,7 +225,7 @@ elif chart_type == "Stacked Area Chart":
         x='Year',
         y=metric,
         color='Manufacturer',
-        title=f"AI Chip {metric} Distribution Over Time ({year_range[0]}-{year_range[1]})",
+        title=f"GPU/AI Chip {metric} Distribution Over Time ({year_range[0]}-{year_range[1]})",
         color_discrete_map={
             'NVIDIA': '#76B900',
             'AMD': '#ED1C24',
@@ -188,6 +233,10 @@ elif chart_type == "Stacked Area Chart":
             'Others': '#808080'
         }
     )
+    # Add vertical line at 2018 to mark market transition
+    if year_range[0] <= 2018 <= year_range[1]:
+        fig.add_vline(x=2017.5, line_dash="dash", line_color="orange",
+                     annotation_text="Market Transition", annotation_position="top")
     fig.update_layout(height=500)
     st.plotly_chart(fig, use_container_width=True)
 
@@ -206,28 +255,46 @@ if show_data:
 
 # Data sources and methodology
 st.header("📚 Data Sources & Methodology")
+
 st.markdown("""
-### Reliable Data Sources:
-- **TechInsights**: Data-Center AI Chip Market Reports (Q1 2024)
-- **Statista**: Data center/AI chip revenue analysis
-- **IDC**: AI Infrastructure market research
-- **Yole Group**: Data center semiconductor trends
-- **Industry Reports**: Market research from Grand View Research, Precedence Research
+### Market Evolution Timeline
 
-### Key Findings:
-- **2023**: $17.7B market - NVIDIA (65%), Intel (22%), AMD (11%) [Source: TechInsights]
-- **2024**: NVIDIA captured 93% of server GPU revenue
-- **2025**: NVIDIA projected at 86-92% AI GPU market share; AMD growing to $5.6B
+#### 2015-2017: General GPU Market Era
+- **Source**: Jon Peddie Research discrete GPU market reports
+- **Market Definition**: Consumer/gaming GPUs, workstation GPUs, early machine learning
+- **Key Observation**: AMD gained significant share in 2016-2017 (peaked at 33.7%) due to cryptocurrency mining demand
+- **Intel**: Not present in discrete GPU market during this period
 
-### Methodology:
-Data compiled from multiple analyst reports and market research firms. Revenue figures
-are estimates based on reported datacenter/AI accelerator segments. Market definitions
-vary by source (some include CPUs, others focus on discrete GPUs/accelerators).
+#### 2018: Transition Year
+- AI workloads began moving from consumer GPUs to dedicated data center solutions
+- NVIDIA introduced Tesla V100 and started dominating the emerging AI accelerator market
+- Market definition shifts from "discrete GPUs" to "AI accelerators"
 
-### Notes:
-- "Others" includes emerging players like Google TPU, AWS Trainium, Cerebras, Graphcore, etc.
-- Intel's share includes both CPU-based AI acceleration and discrete accelerators (Gaudi)
-- Market size grew significantly from 2023-2025 due to AI boom
+#### 2019-2025: AI Accelerator Market Era
+- **Sources**: TechInsights, IDC, Statista, Yole Group, Grand View Research
+- **Market Definition**: Data center AI chips, ML accelerators, training & inference hardware
+- **Intel Entry**: Intel enters with Xeon Phi (discontinued) and later Gaudi accelerators
+- **AMD Shift**: AMD pivots from consumer GPUs to MI-series data center accelerators
+
+### Key Data Points:
+- **2015-2017**: General GPU market ($5-8B), NVIDIA 66-81% share, AMD 19-34%
+- **2023**: $17.7B AI accelerator market - NVIDIA (65%), Intel (22%), AMD (11%) [TechInsights]
+- **2024**: $50B+ market - NVIDIA captured 88-93% of server GPU revenue
+- **2025**: $100B+ projected - NVIDIA 87%, AMD growing to 6.5% ($5.6B)
+
+### Why the Data Shifts
+
+The dramatic market share changes between 2017 and 2020 reflect two factors:
+1. **Market Redefinition**: From general-purpose GPUs to AI-specific accelerators
+2. **Architectural Advantage**: NVIDIA's CUDA ecosystem and Tensor Cores dominated AI training workloads
+3. **New Entrants**: Intel entered with data center AI products; "Others" includes Google TPU, AWS chips, etc.
+
+### Methodology Notes:
+- Revenue figures are estimates based on reported datacenter/AI segments
+- Market definitions vary by source (some include CPUs, others only discrete accelerators)
+- 2015-2017 data represents discrete GPU market, not AI-specific
+- 2018-2019 data interpolated during market transition period
+- "Others" post-2018 includes Google TPU, AWS Trainium/Inferentia, Cerebras, Graphcore, etc.
 """)
 
 st.markdown("---")
