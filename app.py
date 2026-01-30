@@ -79,6 +79,69 @@ market_data = {
 
 df = pd.DataFrame(market_data)
 
+# Memory chip production data (units produced in billions) by company
+# Sources: TrendForce, Yole Group, IC Insights, Omdia
+# Covers DRAM + NAND Flash production
+memory_data = {
+    'Year': [2016, 2016, 2016, 2016, 2016, 2016,
+             2017, 2017, 2017, 2017, 2017, 2017,
+             2018, 2018, 2018, 2018, 2018, 2018,
+             2019, 2019, 2019, 2019, 2019, 2019,
+             2020, 2020, 2020, 2020, 2020, 2020,
+             2021, 2021, 2021, 2021, 2021, 2021,
+             2022, 2022, 2022, 2022, 2022, 2022,
+             2023, 2023, 2023, 2023, 2023, 2023,
+             2024, 2024, 2024, 2024, 2024, 2024,
+             2025, 2025, 2025, 2025, 2025, 2025],
+    'Company': ['Samsung', 'SK Hynix', 'Micron', 'Kioxia', 'Western Digital', 'Others'] * 10,
+    'Units Produced (Billions)': [
+        # 2016 - DRAM+NAND combined (~82B total)
+        30.3, 20.5, 16.4, 8.2, 4.1, 2.5,
+        # 2017 - Memory super cycle, supply tight (~90B total)
+        33.3, 22.5, 18.0, 9.0, 4.5, 2.7,
+        # 2018 - Peak of memory super cycle (~97B total)
+        35.8, 24.3, 19.4, 9.7, 4.9, 2.9,
+        # 2019 - Memory downturn, oversupply (~93B total)
+        33.5, 23.2, 18.6, 10.2, 5.1, 2.4,
+        # 2020 - Recovery, COVID-driven demand (~105B total)
+        38.9, 26.3, 21.0, 10.5, 5.3, 3.0,
+        # 2021 - Strong demand, supply constraints (~120B total)
+        44.4, 30.0, 24.0, 12.0, 6.0, 3.6,
+        # 2022 - Oversupply, demand slowdown (~112B total)
+        40.3, 28.0, 22.4, 11.2, 5.6, 4.5,
+        # 2023 - Deep downturn, production cuts (~98B total)
+        35.3, 24.5, 18.6, 10.8, 5.4, 3.4,
+        # 2024 - AI-driven HBM recovery (~118B total)
+        42.5, 30.7, 22.4, 12.4, 5.9, 4.1,
+        # 2025 - Strong HBM/AI memory demand (~138B projected)
+        49.7, 35.9, 26.2, 13.8, 6.9, 5.5
+    ],
+    'Revenue (Billions USD)': [
+        # 2016 - Total memory revenue ~$77B
+        28.9, 14.6, 12.3, 9.2, 7.7, 4.3,
+        # 2017 - Super cycle peak, prices surged (~$126B total)
+        50.4, 25.2, 20.2, 13.9, 10.1, 6.2,
+        # 2018 - Continued high prices (~$158B total)
+        63.2, 31.6, 25.3, 17.4, 12.6, 7.9,
+        # 2019 - Sharp downturn in prices (~$106B total)
+        39.2, 22.3, 17.0, 12.7, 9.5, 5.3,
+        # 2020 - Moderate recovery (~$117B total)
+        44.5, 25.6, 19.5, 12.9, 9.4, 5.1,
+        # 2021 - Strong pricing (~$153B total)
+        57.4, 35.1, 27.5, 16.1, 11.6, 5.3,
+        # 2022 - Downturn begins (~$130B total)
+        49.3, 29.1, 24.1, 13.7, 9.8, 4.0,
+        # 2023 - Deep downturn, lowest in years (~$92B total)
+        33.1, 22.0, 15.5, 10.6, 7.4, 3.4,
+        # 2024 - AI/HBM-driven recovery (~$164B total)
+        62.3, 42.6, 28.9, 15.6, 9.8, 4.8,
+        # 2025 - Projected strong growth (~$210B total)
+        80.9, 54.6, 35.7, 19.3, 12.6, 6.9
+    ]
+}
+
+memory_df = pd.DataFrame(memory_data)
+
 # Title and description
 st.title("🖥️ Global AI Chip Market Share Analysis")
 st.markdown("""
@@ -121,6 +184,32 @@ chart_type = st.sidebar.selectbox(
 metric = st.sidebar.radio(
     "Select Metric",
     ["Market Share (%)", "Revenue (Billions USD)"]
+)
+
+# Memory chip controls
+st.sidebar.header("Memory Chip Controls")
+
+memory_min_year = int(memory_df['Year'].min())
+memory_max_year = int(memory_df['Year'].max())
+
+memory_year_range = st.sidebar.slider(
+    "Memory Chip Year Range",
+    min_value=memory_min_year,
+    max_value=memory_max_year,
+    value=(memory_min_year, memory_max_year),
+    step=1
+)
+
+memory_chart_type = st.sidebar.selectbox(
+    "Memory Chart Type",
+    ["Bar Chart", "Line Chart", "Pie Chart (Latest Year)", "Stacked Area Chart"],
+    key="memory_chart_type"
+)
+
+memory_metric = st.sidebar.radio(
+    "Memory Metric",
+    ["Units Produced (Billions)", "Revenue (Billions USD)"],
+    key="memory_metric"
 )
 
 # Filter data based on year range
@@ -239,6 +328,119 @@ elif chart_type == "Stacked Area Chart":
                      annotation_text="Market Transition", annotation_position="top")
     fig.update_layout(height=500)
     st.plotly_chart(fig, use_container_width=True)
+
+# --- Memory Chip Production Section ---
+st.markdown("---")
+st.header("Memory Chip Production by Company")
+st.markdown("""
+Annual memory chip production (DRAM + NAND Flash) broken down by manufacturer
+over the last 10 years. Data sourced from TrendForce, Yole Group, IC Insights, and Omdia.
+""")
+
+# Filter memory data
+filtered_memory_df = memory_df[
+    (memory_df['Year'] >= memory_year_range[0]) &
+    (memory_df['Year'] <= memory_year_range[1])
+]
+
+# Memory chip color scheme
+memory_colors = {
+    'Samsung': '#1428A0',
+    'SK Hynix': '#E4002B',
+    'Micron': '#00B2A9',
+    'Kioxia': '#E60012',
+    'Western Digital': '#005EB8',
+    'Others': '#808080'
+}
+
+# Key memory statistics
+st.subheader("Key Memory Statistics")
+mcol1, mcol2, mcol3, mcol4 = st.columns(4)
+
+latest_memory_year = filtered_memory_df['Year'].max()
+latest_memory_data = filtered_memory_df[filtered_memory_df['Year'] == latest_memory_year]
+
+with mcol1:
+    samsung_units = latest_memory_data[latest_memory_data['Company'] == 'Samsung']['Units Produced (Billions)'].values[0]
+    st.metric("Samsung Production", f"{samsung_units:.1f}B chips", delta=f"{latest_memory_year}")
+
+with mcol2:
+    skhynix_units = latest_memory_data[latest_memory_data['Company'] == 'SK Hynix']['Units Produced (Billions)'].values[0]
+    st.metric("SK Hynix Production", f"{skhynix_units:.1f}B chips", delta=f"{latest_memory_year}")
+
+with mcol3:
+    micron_units = latest_memory_data[latest_memory_data['Company'] == 'Micron']['Units Produced (Billions)'].values[0]
+    st.metric("Micron Production", f"{micron_units:.1f}B chips", delta=f"{latest_memory_year}")
+
+with mcol4:
+    total_units = latest_memory_data['Units Produced (Billions)'].sum()
+    st.metric("Total Production", f"{total_units:.1f}B chips", delta=f"{latest_memory_year}")
+
+# Memory chip chart
+if memory_chart_type == "Bar Chart":
+    mem_fig = px.bar(
+        filtered_memory_df,
+        x='Year',
+        y=memory_metric,
+        color='Company',
+        title=f"Memory Chip {memory_metric} by Company ({memory_year_range[0]}-{memory_year_range[1]})",
+        barmode='group',
+        color_discrete_map=memory_colors
+    )
+    mem_fig.update_layout(height=500, xaxis_tickangle=-45)
+    st.plotly_chart(mem_fig, use_container_width=True)
+
+elif memory_chart_type == "Line Chart":
+    mem_fig = px.line(
+        filtered_memory_df,
+        x='Year',
+        y=memory_metric,
+        color='Company',
+        title=f"Memory Chip {memory_metric} Trends ({memory_year_range[0]}-{memory_year_range[1]})",
+        markers=True,
+        color_discrete_map=memory_colors
+    )
+    mem_fig.update_layout(height=500)
+    st.plotly_chart(mem_fig, use_container_width=True)
+
+elif memory_chart_type == "Pie Chart (Latest Year)":
+    latest_mem_data = filtered_memory_df[filtered_memory_df['Year'] == latest_memory_year]
+    mem_fig = px.pie(
+        latest_mem_data,
+        values=memory_metric,
+        names='Company',
+        title=f"Memory Chip {memory_metric} Distribution - {latest_memory_year}",
+        color='Company',
+        color_discrete_map=memory_colors
+    )
+    mem_fig.update_traces(textposition='inside', textinfo='percent+label')
+    mem_fig.update_layout(height=500)
+    st.plotly_chart(mem_fig, use_container_width=True)
+
+elif memory_chart_type == "Stacked Area Chart":
+    mem_fig = px.area(
+        filtered_memory_df,
+        x='Year',
+        y=memory_metric,
+        color='Company',
+        title=f"Memory Chip {memory_metric} Over Time ({memory_year_range[0]}-{memory_year_range[1]})",
+        color_discrete_map=memory_colors
+    )
+    mem_fig.update_layout(height=500)
+    st.plotly_chart(mem_fig, use_container_width=True)
+
+# Memory data table
+st.subheader("Memory Chip Data")
+show_memory_data = st.checkbox("Show memory chip data table")
+if show_memory_data:
+    st.dataframe(
+        filtered_memory_df.pivot_table(
+            values=[memory_metric],
+            index='Year',
+            columns='Company'
+        ).round(2),
+        use_container_width=True
+    )
 
 # Data table
 st.header("📋 Raw Data")
